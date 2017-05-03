@@ -37,6 +37,10 @@ arbList n = do
   return $ List f
 
 prop_flatten xs = flatten xs == flatten' xs
+prop_compress xs = compress xs == compress' xs
+prop_pack xs = pack xs == pack'' xs
+prop_encode xs = encode xs == encode' xs
+
 
 main = do
    quickCheck (prop_myLast :: [Integer] -> Property)
@@ -47,5 +51,8 @@ main = do
    quickCheck (prop_myReverse :: [Integer] -> Bool)
    quickCheck (prop_isPalindrome :: [Char] -> Bool)
    quickCheck (prop_flatten :: (NestedList Integer)  -> Bool)
+   quickCheck (prop_compress :: [Char] -> Bool)
+   quickCheck (prop_pack :: [Int] -> Bool)
+   quickCheck (prop_encode :: [Char] -> Bool)
   -- runTests "1-9" options
   -- [run prop_myLast]
