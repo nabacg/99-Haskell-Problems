@@ -41,11 +41,6 @@ prop_compress xs = compress xs == compress' xs
 prop_pack xs = pack xs == pack'' xs
 prop_encode xs = encode xs == encode' xs
 
-instance Eq a => Eq (EncodeNode a) where
-  (==) (Single a) (Single b) = a == b
-  (==) (Multiple i a) (Multiple j b) = i == j && a == b
-  (==) _ _ = False
-
 instance Arbitrary a => Arbitrary (EncodeNode a) where
   arbitrary =  oneof [liftM Single arbitrary,
                        liftM2 Multiple arbitrary arbitrary]
@@ -53,6 +48,11 @@ instance Arbitrary a => Arbitrary (EncodeNode a) where
 prop_encodeModified xs = encodeModified xs == encodeModified' xs
 prop_decodeModified xs = decodeModified xs == decodeModified' xs
 
+prop_encodeDirect xs = encodeDirect xs == encodeModified' xs
+prop_dupli xs = dupli xs == concat [[x,x] | x <- xs]
+prop_repli xs n = (repli xs n) == ( xs >>= replicate n)
+
+prop_dropEvery xs n = (dropEvery xs n) == (map fst $ filter ((n/=) . snd) $ zip xs (cycle [1..n]))
 
 main = do
    quickCheck (prop_myLast :: [Integer] -> Property)
@@ -68,5 +68,9 @@ main = do
    quickCheck (prop_encode :: [Char] -> Bool)
    quickCheck (prop_encodeModified :: [Integer] -> Bool)
    quickCheck (prop_decodeModified :: [EncodeNode Int] -> Bool)
+   quickCheck (prop_encodeDirect :: [EncodeNode Int] -> Bool)
+   quickCheck (prop_dupli :: [Integer] -> Bool)
+   quickCheck (prop_repli :: [Integer] -> Int -> Bool)
+   quickCheck (prop_dropEvery :: [Char] -> Int -> Bool)
   -- runTests "1-9" options
   -- [run prop_myLast]

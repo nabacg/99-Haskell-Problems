@@ -85,6 +85,11 @@ instance Show a => Show (EncodeNode a) where
     Multiple i n -> "Multiple '" ++ (show i) ++ "' '" ++ show n ++  "']"
     Single n -> "Single '" ++ show n ++ "'"
 
+instance Eq a => Eq (EncodeNode a) where
+  (==) (Single a) (Single b) = a == b
+  (==) (Multiple i a) (Multiple j b) = i == j && a == b
+  (==) _ _ = False
+
 encodeModified :: Eq a => [a] -> [EncodeNode a]
 encodeModified = foldr fn []
   where fn x [] = [(Single x)]
@@ -111,3 +116,28 @@ decodeModified' :: Eq a => [EncodeNode a] -> [a]
 decodeModified' = concatMap decodeFn
   where decodeFn (Single a) = [a]
         decodeFn (Multiple i a) = replicate i a
+
+encodeDirect :: Eq a => [a] -> [EncodeNode a]
+encodeDirect =  foldr fn []
+  where fn x [] = [(Single x)]
+        fn x acc@((Single a):as) = if x == a
+                                  then (Multiple 2 a) : as
+                                  else (Single x) : acc
+        fn x acc@((Multiple c a): as) = if x == a
+                                       then (Multiple (c + 1) a) : as
+                                       else (Single x) : acc
+
+
+dupli :: [a] -> [a]
+dupli = concatMap (replicate 2)
+
+repli :: [a] -> Int -> [a]
+repli xs n = concatMap (replicate n) xs
+
+dropEvery :: [a] -> Int -> [a]
+dropEvery xs n | length xs < 3 = xs
+dropEvery xs n = init a ++ dropEvery b n
+  where (a, b) = splitAt n xs
+
+dropEvery' :: [a] -> Int -> [a]
+dropEvery' xs n = map fst $ filter ((n/=) . snd) (zip xs (cycle [1..n]))
