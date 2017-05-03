@@ -76,3 +76,38 @@ encode xs = map (\x -> (length x, head x)) (pack' xs)
 encode' :: Eq a => [a] -> [(Int, a)]
 encode' [] = []
 encode' (x:xs) = (length $ x : (takeWhile (==x) xs), x) : encode'(dropWhile (==x) xs)
+
+
+data EncodeNode a = Multiple Int a | Single a
+
+instance Show a => Show (EncodeNode a) where
+  show x = case x of
+    Multiple i n -> "Multiple '" ++ (show i) ++ "' '" ++ show n ++  "']"
+    Single n -> "Single '" ++ show n ++ "'"
+
+encodeModified :: Eq a => [a] -> [EncodeNode a]
+encodeModified = foldr fn []
+  where fn x [] = [(Single x)]
+        fn x acc@((Single a):as) = if x == a
+                                  then (Multiple 2 a) : as
+                                  else (Single x) : acc
+        fn x acc@((Multiple c a): as) = if x == a
+                                       then (Multiple (c + 1) a) : as
+                                       else (Single x) : acc
+
+encodeModified' :: Eq a => [a] -> [EncodeNode a]
+encodeModified' = map fn . encode
+  where fn (1, x) = Single x
+        fn (i, x) = Multiple i x
+
+
+
+decodeModified :: Eq a => [EncodeNode a] -> [a]
+decodeModified [] = []
+decodeModified ((Single c):xs) = c : decodeModified xs
+decodeModified ((Multiple i c):xs) = (map (const c) [1..i]) ++ decodeModified xs
+
+decodeModified' :: Eq a => [EncodeNode a] -> [a]
+decodeModified' = concatMap decodeFn
+  where decodeFn (Single a) = [a]
+        decodeFn (Multiple i a) = replicate i a
