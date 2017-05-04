@@ -52,7 +52,9 @@ prop_encodeDirect xs = encodeDirect xs == encodeModified' xs
 prop_dupli xs = dupli xs == concat [[x,x] | x <- xs]
 prop_repli xs n = (repli xs n) == ( xs >>= replicate n)
 
-prop_dropEvery xs n = (dropEvery xs n) == (map fst $ filter ((n/=) . snd) $ zip xs (cycle [1..n]))
+prop_dropEvery xs n = n >= 0 ==> (dropEvery xs n) == dropEvery' xs n
+
+prop_split xs n = n >= 0 ==> (split xs n) == (flip splitAt) xs n
 
 main = do
    quickCheck (prop_myLast :: [Integer] -> Property)
@@ -71,6 +73,7 @@ main = do
    quickCheck (prop_encodeDirect :: [EncodeNode Int] -> Bool)
    quickCheck (prop_dupli :: [Integer] -> Bool)
    quickCheck (prop_repli :: [Integer] -> Int -> Bool)
-   quickCheck (prop_dropEvery :: [Char] -> Int -> Bool)
+   quickCheck (prop_dropEvery :: [Char] -> Int -> Property)
+   quickCheck (prop_split :: [Int] -> Int -> Property)
   -- runTests "1-9" options
   -- [run prop_myLast]

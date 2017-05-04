@@ -1,5 +1,6 @@
 module NinetyNine where
 
+
 myLast :: [a] -> a
 myLast [] = error "No end for empty list!"
 myLast [x] = x
@@ -135,9 +136,17 @@ repli :: [a] -> Int -> [a]
 repli xs n = concatMap (replicate n) xs
 
 dropEvery :: [a] -> Int -> [a]
-dropEvery xs n | length xs < 3 = xs
+dropEvery [] _ = []
+dropEvery xs 0 = xs
+dropEvery xs n | length xs < n = xs
 dropEvery xs n = init a ++ dropEvery b n
   where (a, b) = splitAt n xs
 
 dropEvery' :: [a] -> Int -> [a]
-dropEvery' xs n = map fst $ filter ((n/=) . snd) (zip xs (cycle [1..n]))
+dropEvery' xs n | n > 0 = map fst $ filter ((n/=) . snd) (zip xs (cycle [1..n]))
+dropEvery' xs n = xs
+
+split :: [a] -> Int -> ([a],[a])
+split xs n = (map fst (takeWhile ((n >=) . snd) indexed),
+              map fst (dropWhile ((n >=) . snd) indexed))
+  where indexed = zip xs [1..]
