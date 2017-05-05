@@ -150,3 +150,23 @@ split :: [a] -> Int -> ([a],[a])
 split xs n = (map fst (takeWhile ((n >=) . snd) indexed),
               map fst (dropWhile ((n >=) . snd) indexed))
   where indexed = zip xs [1..]
+
+(|>) :: a -> (a -> t) -> t
+(|>) x f = f x
+
+slice :: [a] -> Int -> Int -> [a]
+slice xs a b = zip xs (cycle [1..])
+               |> filter (\ (x, i) -> i >= a && i <= b)
+               |> map fst
+
+
+rotate :: [a] -> Int -> [a]
+rotate xs n | n >= 0 = b ++ a
+  where (a, b) = splitAt n xs
+rotate xs n = reverse $ rotate (reverse xs) (-n)
+
+rotate' :: [a] -> Int -> [a]
+rotate' xs n = take (length xs) $ drop (length xs + n) $ cycle xs
+
+removeAt ::  Int -> [a] -> (a,[a])
+removeAt n xs = (xs !! (n-1), (take (n - 1) xs) ++ (drop n xs))

@@ -56,6 +56,11 @@ prop_dropEvery xs n = n >= 0 ==> (dropEvery xs n) == dropEvery' xs n
 
 prop_split xs n = n >= 0 ==> (split xs n) == (flip splitAt) xs n
 
+prop_rotate xs n =  n > 0 && n <= length xs ==> rotate xs n == rotate' xs n
+
+prop_removeAt n xs = n > 0 && n <= length xs ==> removeAt n xs == (xs !! (n-1), [x | (i, x) <- zip [1..] xs, i /= n])
+
+
 main = do
    quickCheck (prop_myLast :: [Integer] -> Property)
    quickCheck (prop_myButLast :: [Integer] -> Property)
@@ -75,5 +80,7 @@ main = do
    quickCheck (prop_repli :: [Integer] -> Int -> Bool)
    quickCheck (prop_dropEvery :: [Char] -> Int -> Property)
    quickCheck (prop_split :: [Int] -> Int -> Property)
+   quickCheck (prop_rotate :: [Int] -> Int -> Property)
+   quickCheck (prop_removeAt :: Int -> [Char] -> Property)
   -- runTests "1-9" options
   -- [run prop_myLast]
