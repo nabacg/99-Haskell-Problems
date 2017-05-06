@@ -170,3 +170,14 @@ rotate' xs n = take (length xs) $ drop (length xs + n) $ cycle xs
 
 removeAt ::  Int -> [a] -> (a,[a])
 removeAt n xs = (xs !! (n-1), (take (n - 1) xs) ++ (drop n xs))
+
+
+insertAt :: a -> [a] -> Int -> [a]
+insertAt x xs i = h ++ x : t
+  where (h, t) = splitAt (i - 1) xs
+
+
+range :: Int -> Int -> [Int]
+range i j = [i..]
+            |> dropWhile (\x -> x < i)
+            |> takeWhile (\x -> x <= j)

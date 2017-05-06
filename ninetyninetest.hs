@@ -60,6 +60,9 @@ prop_rotate xs n =  n > 0 && n <= length xs ==> rotate xs n == rotate' xs n
 
 prop_removeAt n xs = n > 0 && n <= length xs ==> removeAt n xs == (xs !! (n-1), [x | (i, x) <- zip [1..] xs, i /= n])
 
+prop_insertAt x xs n  = n > 0 && n <= length xs ==> insertAt x xs n == take (n-1) xs ++ [x] ++ drop (n-1) xs
+
+prop_range i j = i >=0 && i < j ==> range i j == [i..j]
 
 main = do
    quickCheck (prop_myLast :: [Integer] -> Property)
@@ -82,5 +85,7 @@ main = do
    quickCheck (prop_split :: [Int] -> Int -> Property)
    quickCheck (prop_rotate :: [Int] -> Int -> Property)
    quickCheck (prop_removeAt :: Int -> [Char] -> Property)
+   quickCheck (prop_insertAt :: Int -> [Int] -> Int -> Property)
+   quickCheck (prop_range :: Int -> Int -> Property)
   -- runTests "1-9" options
   -- [run prop_myLast]
